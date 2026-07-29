@@ -1,4 +1,4 @@
-name: Start Reforge
+name: Start Kujang Kernel
 
 on:
   workflow_dispatch:
@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: 🔄 Checkout Code
         uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
 
       - name: ⏰ Prepare timezone
         run: |
@@ -66,8 +64,8 @@ jobs:
           export SUBARCH=arm64
           export PATH="$CLANG_PATH/bin:$GCC64_PATH/bin:$GCC32_PATH/bin:$PATH"
 
-          export KBUILD_BUILD_USER=Manipulator
-          export KBUILD_BUILD_HOST=LineageOS
+          export KBUILD_BUILD_USER=Kujang
+          export KBUILD_BUILD_HOST=Kernel
           export KBUILD_COMPILER_STRING="$CLANG_PATH/bin/clang"
 
           make O=out ARCH=arm64 vendor/sweet_defconfig
@@ -78,19 +76,19 @@ jobs:
             LLVM=1 \
             LLVM_IAS=1 \
             CC=clang \
-            CLANG_TRIPLE=aarch64-linux-gnu- \
-            CROSS_COMPILE=aarch64-elf- \
-            CROSS_COMPILE_ARM32=arm-eabi-
+            CLANG_TRIPLE=$CLANG_PATH/bin/aarch64-linux-gnu- \
+            CROSS_COMPILE=$GCC64_PATH/bin/aarch64-elf- \
+            CROSS_COMPILE_ARM32=$GCC32_PATH/bin/arm-eabi-
 
-          cp out/.config out/sweet_defconfig.txt
+          mv out/.config out/sweet_defconfig.txt
 
       - name: 💾 Upload Config
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: configs-${{ env.BUILD_TIME }}
           path: out/sweet_defconfig.txt
 
-      - name: 📂 Clone AnyKernel3
+      - name: 📂 Create Flashable ZIP
         run: |
           git clone --depth=1 -b reforge https://github.com/manipvlator/Anykernel3.git AnyKernel3
 
@@ -99,10 +97,12 @@ jobs:
           cp out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
 
           cd AnyKernel3
-          zip -r "../Reforge-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip" .
+          rm -rf .git .github
+
+          zip -r "../KujangKernel-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip" *
 
       - name: 📤 Upload Flashable ZIP
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
-          name: Reforge-${{ github.ref_name }}-${{ env.BUILD_TIME }}
-          path: Reforge-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip
+          name: KujangKernel-${{ env.BUILD_TIME }}
+          path: KujangKernel-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip
