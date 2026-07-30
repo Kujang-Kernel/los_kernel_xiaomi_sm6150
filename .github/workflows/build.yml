@@ -10,8 +10,6 @@ jobs:
     steps:
     - name: 🔄 Checkout Code
       uses: actions/checkout@v5
-      with:
-        fetch-depth: 0
 
     - name: ⏰ Prepare timezone
       run: |
@@ -54,21 +52,26 @@ jobs:
 
     - name: ⚙️ Setup Environment
       run: |
-        echo "BUILD_TIME=$(TZ=Asia/Jakarta date +'%d%m%Y-%H%M')" >> $GITHUB_ENV
-        echo "BUILD_DATE=$(TZ=Asia/Jakarta date +'%b %d %Y')" >> $GITHUB_ENV
+        echo "BUILD_TIME=$(TZ=Asia/Jakarta date '+%d%m%Y-%H%M')" >> $GITHUB_ENV
         echo "CLANG_PATH=$GITHUB_WORKSPACE/clang" >> $GITHUB_ENV
         echo "GCC64_PATH=$GITHUB_WORKSPACE/gcc64" >> $GITHUB_ENV
         echo "GCC32_PATH=$GITHUB_WORKSPACE/gcc32" >> $GITHUB_ENV
 
+    - name: 📅 Set BUILD DATE
+      run: |
+        echo "BUILD_DATE='\"$(TZ=Asia/Jakarta date '+%b %d %Y')\"'" >> $GITHUB_ENV
+
     - name: 🛠️ Build Kernel
       run: |
         export ARCH=arm64
-        export SUBARCH=arm64
         export PATH="$CLANG_PATH/bin:$GCC64_PATH/bin:$GCC32_PATH/bin:$PATH"
 
         export KBUILD_BUILD_USER=Kujang
         export KBUILD_BUILD_HOST=Kernel
-        export KBUILD_COMPILER_STRING="$CLANG_PATH/bin/clang"
+        export KBUILD_COMPILER_STRING="$CLANG_PATH/clang"
+
+        export BUILD_DATE=$BUILD_DATE
+        export CFLAGS_EXTRA="-DBUILD_DATE=$BUILD_DATE"
 
         make O=out ARCH=arm64 vendor/sweet_defconfig
 
@@ -78,11 +81,11 @@ jobs:
           LLVM=1 \
           LLVM_IAS=1 \
           CC=clang \
-          CLANG_TRIPLE=aarch64-linux-gnu- \
-          CROSS_COMPILE=aarch64-elf- \
-          CROSS_COMPILE_ARM32=arm-eabi-
+          CLANG_TRIPLE=$CLANG_PATH/aarch64-linux-gnu- \
+          CROSS_COMPILE=$GCC64_PATH/bin/aarch64-elf- \
+          CROSS_COMPILE_ARM32=$GCC32_PATH/bin/arm-eabi-
 
-        cp out/.config out/sweet_defconfig.txt
+        mv out/.config out/sweet_defconfig.txt
 
     - name: 💾 Upload Config
       uses: actions/upload-artifact@v5
@@ -90,7 +93,7 @@ jobs:
         name: configs-${{ env.BUILD_TIME }}
         path: out/sweet_defconfig.txt
 
-    - name: 📂 Clone AnyKernel3
+    - name: 📂 Clone AnyKernel3 & Package
       run: |
         git clone --depth=1 -b reforge https://github.com/Kujang-Kernel/Anykernel3.git AnyKernel3
 
@@ -98,8 +101,12 @@ jobs:
         cp out/arch/arm64/boot/dtb.img AnyKernel3/dtb.img
         cp out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
 
+        # Hapus metadata git agar tidak ikut ke ZIP
+        rm -rf AnyKernel3/.git
+
         cd AnyKernel3
-        zip -r "../KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip" .
+
+        zip -r "../KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip" *
 
     - name: 📤 Upload Flashable ZIP
       uses: actions/upload-artifact@v5
