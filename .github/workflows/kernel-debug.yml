@@ -1,0 +1,53 @@
+name: Kernel Debug
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y bc flex bison cpio
+
+      - name: Generate Defconfig
+        run: |
+          make O=out ARCH=arm64 vendor/sweet_defconfig
+
+      - name: Show Localversion
+        run: |
+          echo "===== CONFIG_LOCALVERSION ====="
+          grep LOCALVERSION out/.config || true
+
+      - name: Show SCM Version
+        run: |
+          echo "===== .scmversion ====="
+          if [ -f .scmversion ]; then
+            cat .scmversion
+          else
+            echo "No .scmversion"
+          fi
+
+      - name: Show Kernel Release
+        run: |
+          echo "===== kernelrelease ====="
+          make O=out ARCH=arm64 kernelrelease
+
+      - name: Show Git Info
+        run: |
+          echo "===== Git Branch ====="
+          git branch
+
+          echo "===== Git Commit ====="
+          git rev-parse --short HEAD
+
+          echo "===== Git Status ====="
+          git status
