@@ -116,8 +116,3 @@ jobs:
       with:
         name: KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}
         path: KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip
-    - name: 📤 Upload Flashable ZIP
-      uses: actions/upload-artifact@v5
-      with:
-        name: KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}
-        path: KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip
