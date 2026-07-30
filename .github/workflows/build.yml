@@ -20,36 +20,37 @@ jobs:
       run: |
         sudo apt update -y
         sudo apt install -y \
-        bc \
-        cpio \
-        flex \
-        bison \
-        aptitude \
-        git \
-        python-is-python3 \
-        tar \
-        aria2 \
-        perl \
-        wget \
-        curl \
-        lz4 \
-        libssl-dev
+          bc \
+          cpio \
+          flex \
+          bison \
+          aptitude \
+          git \
+          python-is-python3 \
+          tar \
+          aria2 \
+          perl \
+          wget \
+          curl \
+          lz4 \
+          libssl-dev \
+          zstd
 
-    - name: 🔧 Clone Toolchains
+    - name: 🔧 Download Neutron Clang 18
       run: |
-        mkdir clang
+        mkdir -p clang
         cd clang
 
-        curl -LO https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman
-        chmod +x antman
+        wget -q https://github.com/Neutron-Toolchains/clang-build-catalogue/releases/download/05012024/neutron-clang-05012024.tar.zst
 
-        ./antman -S
-        ./antman --patch=glibc
+        tar --zstd -xf neutron-clang-05012024.tar.zst
+
+        rm -f neutron-clang-05012024.tar.zst
 
         cd ..
 
-        git clone https://github.com/greenforce-project/gcc-arm64 -b main --depth=1 gcc64
-        git clone https://github.com/greenforce-project/gcc-arm -b main --depth=1 gcc32
+        git clone --depth=1 -b main https://github.com/greenforce-project/gcc-arm64 gcc64
+        git clone --depth=1 -b main https://github.com/greenforce-project/gcc-arm gcc32
 
     - name: ⚙️ Setup Environment
       run: |
@@ -65,11 +66,12 @@ jobs:
     - name: 🛠️ Build Kernel
       run: |
         export ARCH=arm64
+        export SUBARCH=arm64
         export PATH="$CLANG_PATH/bin:$GCC64_PATH/bin:$GCC32_PATH/bin:$PATH"
 
         export KBUILD_BUILD_USER=Kujang
         export KBUILD_BUILD_HOST=Kernel
-        export KBUILD_COMPILER_STRING="$CLANG_PATH/clang"
+        export KBUILD_COMPILER_STRING="Neutron Clang 18"
 
         export BUILD_DATE=$BUILD_DATE
         export CFLAGS_EXTRA="-DBUILD_DATE=$BUILD_DATE"
@@ -82,7 +84,7 @@ jobs:
           LLVM=1 \
           LLVM_IAS=1 \
           CC=clang \
-          CLANG_TRIPLE=$CLANG_PATH/aarch64-linux-gnu- \
+          CLANG_TRIPLE=aarch64-linux-gnu- \
           CROSS_COMPILE=$GCC64_PATH/bin/aarch64-elf- \
           CROSS_COMPILE_ARM32=$GCC32_PATH/bin/arm-eabi-
 
