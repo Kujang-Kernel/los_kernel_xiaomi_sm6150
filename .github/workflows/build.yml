@@ -13,26 +13,27 @@ jobs:
 
     - name: ⏰ Prepare timezone
       run: |
-        sudo ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+        sudo rm -f /etc/localtime
+        sudo ln -s /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 
     - name: 📦 Install Dependencies
       run: |
         sudo apt update -y
         sudo apt install -y \
-          bc \
-          cpio \
-          flex \
-          bison \
-          aptitude \
-          git \
-          python-is-python3 \
-          tar \
-          aria2 \
-          perl \
-          wget \
-          curl \
-          lz4 \
-          libssl-dev
+        bc \
+        cpio \
+        flex \
+        bison \
+        aptitude \
+        git \
+        python-is-python3 \
+        tar \
+        aria2 \
+        perl \
+        wget \
+        curl \
+        lz4 \
+        libssl-dev
 
     - name: 🔧 Clone Toolchains
       run: |
@@ -47,8 +48,8 @@ jobs:
 
         cd ..
 
-        git clone --depth=1 https://github.com/greenforce-project/gcc-arm64 -b main gcc64
-        git clone --depth=1 https://github.com/greenforce-project/gcc-arm -b main gcc32
+        git clone https://github.com/greenforce-project/gcc-arm64 -b main --depth=1 gcc64
+        git clone https://github.com/greenforce-project/gcc-arm -b main --depth=1 gcc32
 
     - name: ⚙️ Setup Environment
       run: |
@@ -95,19 +96,26 @@ jobs:
 
     - name: 📂 Clone AnyKernel3 & Package
       run: |
-        git clone --depth=1 -b reforge https://github.com/Kujang-Kernel/Anykernel3.git AnyKernel3
+        git clone --depth=1 \
+          -b Kujang_anykernel3 \
+          https://github.com/Kujang-Kernel/Anykernel3.git \
+          AnyKernel3
 
         cp out/arch/arm64/boot/Image.gz AnyKernel3/Image.gz
         cp out/arch/arm64/boot/dtb.img AnyKernel3/dtb.img
         cp out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
 
-        # Hapus metadata git agar tidak ikut ke ZIP
         rm -rf AnyKernel3/.git
 
         cd AnyKernel3
 
-        zip -r "../KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip" *
+        zip -r "../KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip" .
 
+    - name: 📤 Upload Flashable ZIP
+      uses: actions/upload-artifact@v5
+      with:
+        name: KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}
+        path: KujangKernel-KSU-${{ github.ref_name }}-${{ env.BUILD_TIME }}.zip
     - name: 📤 Upload Flashable ZIP
       uses: actions/upload-artifact@v5
       with:
