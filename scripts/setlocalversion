@@ -186,8 +186,8 @@ else
 	# looks at signed or annotated tags - git tag -a/-s) and
 	# LOCALVERSION= is not specified
 	if test "${LOCALVERSION+set}" != "set"; then
-		#scm=$(scm_version --short)
-		res="$res${res}-stable"
+		scm=$(scm_version --short)
+		res="-stable"
 	fi
 fi
 
