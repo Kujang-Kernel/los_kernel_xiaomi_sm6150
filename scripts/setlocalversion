@@ -167,8 +167,6 @@ else
 	exit 1
 fi
 
-#!/bin/sh
-
 # localversion* files in the build and source directory
 res="$(collect_files localversion*)"
 if test ! "$srctree" -ef .; then
