@@ -167,6 +167,8 @@ else
 	exit 1
 fi
 
+#!/bin/sh
+
 # localversion* files in the build and source directory
 res="$(collect_files localversion*)"
 if test ! "$srctree" -ef .; then
@@ -176,19 +178,7 @@ fi
 # CONFIG_LOCALVERSION and LOCALVERSION (if set)
 res="${res}${CONFIG_LOCALVERSION}${LOCALVERSION}"
 
-# scm version string if not at a tagged commit
-if test "$CONFIG_LOCALVERSION_AUTO" = "y"; then
-	# full scm version string
-	res="$res$(scm_version)"
-else
-	# append a plus sign if the repository is not in a clean
-	# annotated or signed tagged state (as git describe only
-	# looks at signed or annotated tags - git tag -a/-s) and
-	# LOCALVERSION= is not specified
-	if test "${LOCALVERSION+set}" != "set"; then
-		scm=$(scm_version --short)
-		res="-stable"
-	fi
-fi
+# Paksa secara mutlak agar belakangnya langsung -stable
+res="${res}-stable"
 
 echo "$res"
