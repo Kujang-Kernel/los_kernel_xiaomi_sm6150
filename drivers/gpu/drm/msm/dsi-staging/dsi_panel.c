@@ -1,10 +1,4 @@
 /*
- * dsi_panel.c - Based on current bawaan (commit yang sedang dipakai)
- * + Added 90Hz panel support (60Hz / 90Hz / 120Hz) from the 90Hz patch
- * Compatible with sweet 90Hz panel commit
- */
-
-/*
  * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1952,6 +1946,7 @@ const char *cmd_set_prop_map[DSI_CMD_SET_MAX] = {
 	"qcom,mdss-dsi-dispparam-hbm-fod-off-command",
 	"qcom,mdss-dsi-read-lockdown-info-command",
 	"qcom,mdss-dsi-dispparam-bc-120hz-command",
+	"qcom,mdss-dsi-dispparam-bc-90hz-command",
 	"qcom,mdss-dsi-dispparam-bc-60hz-command",
 };
 
@@ -1988,6 +1983,7 @@ const char *cmd_set_state_map[DSI_CMD_SET_MAX] = {
 	"qcom,mdss-dsi-dispparam-hbm-fod-off-command-state",
 	"qcom,mdss-dsi-read-lockdown-info-command-state",
 	"qcom,mdss-dsi-dispparam-bc-120hz-command-state",
+	"qcom,mdss-dsi-dispparam-bc-90hz-command-state",
 	"qcom,mdss-dsi-dispparam-bc-60hz-command-state",
 };
 
@@ -3894,8 +3890,9 @@ void dsi_panel_gamma_mode_change(struct dsi_panel *panel,
 		goto exit;
 	}
 
-	/* Support 60Hz / 90Hz / 120Hz from 90Hz panel patch */
 	count = cur_mode->priv_info->cmd_sets[DSI_CMD_SET_DISP_BC_120HZ].count;
+	if (!count)
+		count = cur_mode->priv_info->cmd_sets[DSI_CMD_SET_DISP_BC_90HZ].count;
 	if (!count)
 		count = cur_mode->priv_info->cmd_sets[DSI_CMD_SET_DISP_BC_60HZ].count;
 	if (!count)
@@ -3909,7 +3906,7 @@ void dsi_panel_gamma_mode_change(struct dsi_panel *panel,
 		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_DISP_BC_60HZ);
 
 	if (rc)
-		pr_err("%s: send cmds failed for %dHz\n", __func__, adj_mode->timing.refresh_rate);
+		pr_err("%s: send cmds failed...", __func__);
 	else
 		pr_info("%s: refresh_rate[%d]\n", __func__, adj_mode->timing.refresh_rate);
 
