@@ -1,9 +1,4 @@
 /*
- * sweet-sdmmagpie.dtsi - Based on bawaan + 90Hz backlight adjustment
- * Only changed: qcom,mdss-dsi-bl-min-level = <20>
- */
-
-/*
 this file is for attribution only of aquila
 And public attribution of xiaomi platforms(like F3 and so and)
 */
