@@ -1,11 +1,3 @@
-/*
- * dsi-panel-k6-38-0c-0a-fhd-dsc-video.dtsi
- * Based on bawaan + 90Hz support from 90Hz variant
- * - Added 90 to DFPS list
- * - Added BC 90Hz command
- * - Added 90Hz DC CRC setting
- */
-
 /* Copyright (c) 2019, The Linux Foundation. All rights reserved.
  * Copyright (C) 2021 XiaoMi, Inc.
  *
@@ -185,13 +177,13 @@
 					39 00 00 00 00 00 02 F7 0B
 					39 01 00 00 00 00 03 F0 A5 A5];
 				qcom,mdss-dsi-dispparam-bc-120hz-command-state = "dsi_lp_mode";
-				qcom,mdss-dsi-dispparam-bc-90hz-command = [
-					/* Brightness Control - Freq Setting */
-					39 00 00 00 00 00 03 F0 5A 5A
-					39 00 00 00 00 00 02 60 01
-					39 00 00 00 00 00 02 F7 0B
-					39 01 00 00 00 00 03 F0 A5 A5];
-				qcom,mdss-dsi-dispparam-bc-90hz-command-state = "dsi_lp_mode";
+		qcom,mdss-dsi-dispparam-bc-90hz-command = [
+			/* Brightness Control - Freq Setting */
+			39 00 00 00 00 00 03 F0 5A 5A
+			39 00 00 00 00 00 02 60 01
+			39 00 00 00 00 00 02 F7 0B
+			39 01 00 00 00 00 03 F0 A5 A5];
+		qcom,mdss-dsi-dispparam-bc-90hz-command-state = "dsi_lp_mode";
 				qcom,mdss-dsi-dispparam-bc-60hz-command = [
 					/* Brightness Control - Freq Setting */
 					39 00 00 00 00 00 03 F0 5A 5A
@@ -219,16 +211,6 @@
 					39 01 00 00 00 00 03 51 01 E8
 				];
 				qcom,mdss-dsi-dispparam-60hz-dc-crc-setting-command-state = "dsi_lp_mode";
-				qcom,mdss-dsi-dispparam-90hz-dc-crc-setting-command = [
-					39 01 00 00 00 00 03 F0 5A 5A
-					39 00 00 00 00 00 02 80 05
-					39 00 00 00 00 00 02 B1 00
-					39 00 00 00 00 00 04 B0 00 01 B1
-					39 00 00 00 00 00 16 B1 01 00 00 00 01 00 00 00 01 00 01 01 01 00 01 01 01 00 01 01 01
-					39 00 00 00 00 00 03 F0 A5 A5
-					39 00 00 00 00 00 03 51 01 E8
-				];
-				qcom,mdss-dsi-dispparam-90hz-dc-crc-setting-command-state = "dsi_lp_mode";
 				qcom,mdss-dsi-dispparam-120hz-dc-crc-setting-command = [
 					39 01 00 00 00 00 03 F0 5A 5A
 					39 00 00 00 00 00 02 80 05
