@@ -1,9 +1,4 @@
 /*
- * dsi_defs.h - Based on bawaan + 90Hz support
- * Added: DSI_CMD_SET_DISP_BC_90HZ
- */
-
-/*
  * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
