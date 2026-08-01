@@ -1,10 +1,4 @@
 /*
- * dsi_display.c - Based on current bawaan (commit yang sedang dipakai)
- * + Added 90Hz panel support (60Hz / 90Hz / 120Hz) from the 90Hz patch
- * Compatible with sweet 90Hz panel commit
- */
-
-/*
  * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -6993,10 +6987,8 @@ int dsi_display_set_mode(struct dsi_display *display,
 	}
 
 #ifdef CONFIG_MACH_XIAOMI_SWEET
-	/* Support 60Hz / 90Hz from 90Hz panel patch */
 	if (adj_mode.timing.refresh_rate == 60 ||
-	    adj_mode.timing.refresh_rate == 90 ||
-	    adj_mode.timing.refresh_rate == 120)
+	    adj_mode.timing.refresh_rate == 90)
 		dsi_panel_gamma_mode_change(display->panel, &adj_mode);
 #endif
 
