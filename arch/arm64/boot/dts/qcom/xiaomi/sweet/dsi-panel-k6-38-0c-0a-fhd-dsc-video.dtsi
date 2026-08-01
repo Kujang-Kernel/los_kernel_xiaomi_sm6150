@@ -1,3 +1,11 @@
+/*
+ * dsi-panel-k6-38-0c-0a-fhd-dsc-video.dtsi
+ * Based on bawaan + 90Hz support from 90Hz variant
+ * - Added 90 to DFPS list
+ * - Added BC 90Hz command
+ * - Added 90Hz DC CRC setting
+ */
+
 /* Copyright (c) 2019, The Linux Foundation. All rights reserved.
  * Copyright (C) 2021 XiaoMi, Inc.
  *
