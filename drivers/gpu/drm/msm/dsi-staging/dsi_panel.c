@@ -1,4 +1,10 @@
 /*
+ * dsi_panel.c - Based on current bawaan (commit yang sedang dipakai)
+ * + Added 90Hz panel support (60Hz / 90Hz / 120Hz) from the 90Hz patch
+ * Compatible with sweet 90Hz panel commit
+ */
+
+/*
  * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -3888,17 +3894,22 @@ void dsi_panel_gamma_mode_change(struct dsi_panel *panel,
 		goto exit;
 	}
 
+	/* Support 60Hz / 90Hz / 120Hz from 90Hz panel patch */
 	count = cur_mode->priv_info->cmd_sets[DSI_CMD_SET_DISP_BC_120HZ].count;
+	if (!count)
+		count = cur_mode->priv_info->cmd_sets[DSI_CMD_SET_DISP_BC_60HZ].count;
 	if (!count)
 		goto exit;
 
 	if (adj_mode->timing.refresh_rate == 120)
 		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_DISP_BC_120HZ);
+	else if (adj_mode->timing.refresh_rate == 90)
+		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_DISP_BC_90HZ);
 	else if (adj_mode->timing.refresh_rate == 60)
 		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_DISP_BC_60HZ);
 
 	if (rc)
-		pr_err("%s: send cmds failed...", __func__);
+		pr_err("%s: send cmds failed for %dHz\n", __func__, adj_mode->timing.refresh_rate);
 	else
 		pr_info("%s: refresh_rate[%d]\n", __func__, adj_mode->timing.refresh_rate);
 
